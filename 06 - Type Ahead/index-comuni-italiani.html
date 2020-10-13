@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CAP Finder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="Città o CAP">
+    <ul class="suggestions">
+      <li>Filtra per nome città</li>
+      <li>oppure per CAP</li>
+    </ul>
+  </form>
+<script>
+  const endpoint = 'https://raw.githubusercontent.com/matteocontrini/comuni-json/master/comuni.json';
+  
+  const cities = [];
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+
+
+  fetch(endpoint)
+        .then(blob => blob.json())
+        .then(data => cities.push(...data));
+
+  function findMatchers(wordToMatch, cities){
+    return cities.filter(place => {
+      const regex = new RegExp(wordToMatch, 'gi');
+      return place.nome.match(regex);
+    });
+  }
+
+  function displayMatches(){
+    if (this.value.length < 3) {
+      suggestions.innerHTML = '';
+      return;
+    }
+    const matchArray = findMatchers(this.value, cities);
+    const html = matchArray
+      .sort((a, b) =>{
+        return a.popolazione > b.popolazione ? -1 : 1;
+      })
+      .map(place =>{
+          const regex = new RegExp(this.value, 'gi');
+          const cityName = place.nome.replace(regex, `<span class="hl">${this.value}</span>`);
+          let cap = 'CAP: ' + place.cap[0];
+
+          if (place.cap.length > 1)
+            cap += " ...e altri +" + (place.cap.length-1);
+      
+          return `
+          <li>
+            <span class="name">${cityName}, ${place.sigla}</span>
+            <span class="population">${cap}</span>
+          </li>
+          `;
+        })
+      .join('');
+    
+    suggestions.innerHTML = html;
+  }
+
+  
+
+  searchInput.addEventListener('change', displayMatches);
+  searchInput.addEventListener('keyup', displayMatches);
+
+</script>
+</body>
+</html>
