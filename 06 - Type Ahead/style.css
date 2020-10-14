@@ -6,6 +6,17 @@ html {
   font-weight: 200;
 }
 
+.header {
+  width: 50%;
+  margin: 0 auto;
+  color: white;
+  text-align:center;
+}
+.header h1{
+
+  text-align:center;
+}
+
 *, *:before, *:after {
   box-sizing: inherit;
 }

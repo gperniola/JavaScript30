@@ -6,7 +6,9 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+  <div class="header">
+    <h1>CAP Finder </h1>
+  </div>
   <form class="search-form">
     <input type="text" class="search" placeholder="Città o CAP">
     <ul class="suggestions">
@@ -29,7 +31,7 @@
   function findMatchers(wordToMatch, cities){
     return cities.filter(place => {
       const regex = new RegExp(wordToMatch, 'gi');
-      return place.nome.match(regex);
+      return place.nome.match(regex) || place.cap.some(c => c.match(regex));
     });
   }
 
@@ -47,14 +49,15 @@
           const regex = new RegExp(this.value, 'gi');
           const cityName = place.nome.replace(regex, `<span class="hl">${this.value}</span>`);
           let cap = 'CAP: ' + place.cap[0];
+          let population = 'Abitanti: ' + place.popolazione.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
           if (place.cap.length > 1)
-            cap += " ...e altri +" + (place.cap.length-1);
+            cap += " ... " + (place.cap[place.cap.length-1]);
       
           return `
           <li>
-            <span class="name">${cityName}, ${place.sigla}</span>
-            <span class="population">${cap}</span>
+            <span class="name">${cityName} (${place.sigla})</span>
+            <span class="population">${cap}<br>${population}</span>
           </li>
           `;
         })
